@@ -8,8 +8,10 @@ const prisma = new PrismaClient();
 
 equipe.get('/equipes', async (c) => {
     const session = await verifySession(c);
-    console.log(session)
 
+    if (!session) {
+        return c.json({ message: "Non connecté" }, 401);
+    }
     const equipes = await prisma.equipe.findMany({
         where: {
             userId: session?.userId
@@ -74,9 +76,9 @@ equipe.post('equipe', async (c) => {
         const session = await verifySession(c);
         const { nom, description } = await c.req.json();
 
-        // if (!session) {
-        //     return c.json({ message: "Non connecté" }, 401);
-        // }
+        if (!session) {
+            return c.json({ message: "Non connecté" }, 401);
+        }
 
         const equipe = await prisma.equipe.create({
             data: {
@@ -103,9 +105,9 @@ equipe.post('equipe', async (c) => {
 equipe.post('/equipe/:id/pokemon', async (c) => {
     try {
         const session = await verifySession(c);
-        // if (!session) {
-        //     return c.json({ message: "Non connecté" }, 401);
-        // }
+        if (!session) {
+            return c.json({ message: "Non connecté" }, 401);
+        }
 
         const equipeId = c.req.param('id');
         const { pokemon } = await c.req.json();
